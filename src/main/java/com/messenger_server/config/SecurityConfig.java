@@ -1,5 +1,6 @@
 package com.messenger_server.config;
 
+import com.messenger_server.config.JwtRequestFilter;
 import com.messenger_server.service.CustomUserDetailsService;
 import com.messenger_server.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,7 @@ public class SecurityConfig {
 						.authorizeRequests(auth -> auth
 										.requestMatchers("/error").permitAll()
 										.requestMatchers("/auth/register", "/auth/login").permitAll()
+										.requestMatchers("/ws/**").permitAll() // WebSocket 경로 허용
 										.anyRequest().authenticated()
 						)
 						.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

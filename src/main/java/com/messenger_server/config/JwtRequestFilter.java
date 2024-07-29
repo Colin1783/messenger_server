@@ -40,14 +40,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		final String requestTokenHeader = request.getHeader("Authorization");
+		String requestTokenHeader = request.getHeader("Authorization");
+		if (requestTokenHeader == null) {
+			requestTokenHeader = request.getParameter("token");
+		}
+
 		System.out.println("Authorization Header: " + requestTokenHeader);
 
 		String username = null;
 		String jwtToken = null;
 
-		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-			jwtToken = requestTokenHeader.substring(7);
+		if (requestTokenHeader != null) {
+			if (requestTokenHeader.startsWith("Bearer ")) {
+				jwtToken = requestTokenHeader.substring(7);
+			} else {
+				jwtToken = requestTokenHeader;
+			}
+
 			try {
 				username = jwtUtil.extractUsername(jwtToken);
 			} catch (TokenExpiredException e) {

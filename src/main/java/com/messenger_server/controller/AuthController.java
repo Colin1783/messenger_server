@@ -19,42 +19,58 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
-	@Autowired
-	private AuthenticationManager authenticationManager;
+	private final AuthenticationManager authenticationManager;
+	private final CustomUserDetailsService userDetailsService;
+	private final JwtUtil jwtUtil;
+	private final UserService userService;
 
 	@Autowired
-	private CustomUserDetailsService userDetailsService;
+	public AuthController(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, JwtUtil jwtUtil, UserService userService) {
+		this.authenticationManager = authenticationManager;
+		this.userDetailsService = userDetailsService;
+		this.jwtUtil = jwtUtil;
+		this.userService = userService;
+	}
 
-	@Autowired
-	private JwtUtil jwtUtil;
-
-	@Autowired
-	private UserService userService;
-
+	// 회원가입
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody User user) {
 		userService.save(user);
 		return ResponseEntity.ok("User registered successfully");
 	}
 
+	// 로그인
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
+		// 인증 처리
 		try {
-			// 사용자의 인증을 시도합니다.
 			Authentication authentication = authenticationManager.authenticate(
 							new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
 			);
+			// 인증 성공 시 JWT 토큰 생성
+			UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+			String jwt = jwtUtil.generateToken(userDetails);
 
-			// 인증된 사용자의 정보를 가져옵니다.
+			// 로그인 상태 업데이트
+			userService.updateLoginStatusAndLastLoggedIn(authRequest.getUsername(), true);
 
-			final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-			final String jwt = jwtUtil.generateToken(userDetails);
-
-			// JWT 토큰을 생성합니다.
+			// JWT 토큰 생성
 			return ResponseEntity.ok(new AuthResponse(jwt));
 		} catch (AuthenticationException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed");
 		}
+	}
+
+	// 로그아웃
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+		if (token.startsWith("Bearer ")) {
+			token = token.substring(7);
+		}
+		// 토큰에서 username 추출
+		String username = jwtUtil.extractUsername(token);
+		userService.logout(username);
+		return ResponseEntity.ok("Logged out successfully");
 	}
 }
 
@@ -62,8 +78,6 @@ public class AuthController {
 class AuthRequest {
 	private String username;
 	private String password;
-
-	// getters and setters
 }
 
 @Data

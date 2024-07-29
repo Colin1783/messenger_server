@@ -1,9 +1,9 @@
 package com.messenger_server.domain;
 
 import lombok.Data;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
+import java.sql.Timestamp;
 
 @Data
 public class User {
@@ -16,4 +16,6 @@ public class User {
 	private String cellphone;
 	private LocalDate createdAt;
 	private String role;
+	private boolean loginStatus;
+	private Timestamp lastLoggedIn;
 }

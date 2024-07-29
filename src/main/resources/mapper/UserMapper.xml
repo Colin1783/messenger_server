@@ -7,4 +7,9 @@
     <select id="findByUsername" resultType="com.messenger_server.domain.User">
         SELECT * FROM users WHERE username = #{username}
     </select>
+    <update id="updateLoginStatusAndLastLoggedIn" parameterType="map">
+        UPDATE users
+        SET login_status = #{loginStatus}, last_logged_in = #{lastLoggedIn}
+        WHERE username = #{username}
+    </update>
 </mapper>
