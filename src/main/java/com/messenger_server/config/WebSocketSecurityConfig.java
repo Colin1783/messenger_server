@@ -17,11 +17,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.messaging.simp.stomp.StompCommand;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
-
-import java.util.Map;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -55,9 +50,9 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
 			public Message<?> preSend(Message<?> message, MessageChannel channel) {
 				StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 				if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-					String token = (String) message.getHeaders().get("simpMessageType");
-					if (token != null && token.startsWith("Bearer ")) {
-						String jwtToken = token.substring(7);
+					String token = accessor.getFirstNativeHeader("token");
+					if (token != null) {
+						String jwtToken = token;
 						String username = jwtUtil.extractUsername(jwtToken);
 
 						if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

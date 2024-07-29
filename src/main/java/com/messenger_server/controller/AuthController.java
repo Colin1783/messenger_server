@@ -42,20 +42,21 @@ public class AuthController {
 	// 로그인
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
-		// 인증 처리
 		try {
 			Authentication authentication = authenticationManager.authenticate(
 							new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
 			);
-			// 인증 성공 시 JWT 토큰 생성
 			UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
 			String jwt = jwtUtil.generateToken(userDetails);
 
 			// 로그인 상태 업데이트
 			userService.updateLoginStatusAndLastLoggedIn(authRequest.getUsername(), true);
 
-			// JWT 토큰 생성
-			return ResponseEntity.ok(new AuthResponse(jwt));
+			// 사용자 정보 가져오기
+			User user = userService.findByUsername(authRequest.getUsername());
+
+			// JWT 토큰과 사용자 정보 포함해서 응답 반환
+			return ResponseEntity.ok(new AuthResponse(jwt, user));
 		} catch (AuthenticationException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed");
 		}
@@ -67,7 +68,6 @@ public class AuthController {
 		if (token.startsWith("Bearer ")) {
 			token = token.substring(7);
 		}
-		// 토큰에서 username 추출
 		String username = jwtUtil.extractUsername(token);
 		userService.logout(username);
 		return ResponseEntity.ok("Logged out successfully");
@@ -83,12 +83,18 @@ class AuthRequest {
 @Data
 class AuthResponse {
 	private String jwt;
+	private User user;
 
-	public AuthResponse(String jwt) {
+	public AuthResponse(String jwt, User user) {
 		this.jwt = jwt;
+		this.user = user;
 	}
 
 	public String getJwt() {
 		return jwt;
+	}
+
+	public User getUser() {
+		return user;
 	}
 }
