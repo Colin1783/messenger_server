@@ -3,6 +3,7 @@ package com.messenger_server.mapper;
 import com.messenger_server.domain.Message;
 import org.apache.ibatis.annotations.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -13,7 +14,11 @@ public interface MessageMapper {
 
 	@Select("SELECT m.*, u.username as username FROM messages m JOIN users u ON m.sender_id = u.id WHERE m.chat_room_id = #{chatRoomId} ORDER BY m.created_at ASC")
 	@Results({
-					@Result(property = "username", column = "username")
+					@Result(property = "username", column = "username"),
+					@Result(property = "chatRoomId", column = "chat_room_id"),
+					@Result(property = "createdAt", column = "created_at", javaType = LocalDateTime.class),
+					@Result(property = "senderId", column = "sender_id"),
+					@Result(property = "createdAt", column = "created_at")
 	})
 	List<Message> findByChatRoomId(Long chatRoomId);
 

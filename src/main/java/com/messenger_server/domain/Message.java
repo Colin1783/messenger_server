@@ -2,7 +2,7 @@ package com.messenger_server.domain;
 
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 public class Message {
@@ -10,6 +10,6 @@ public class Message {
 	private Long chatRoomId;
 	private Long senderId;
 	private String content;
-	private Timestamp createdAt;
+	private LocalDateTime createdAt;  // 변경된 부분
 	private String username;  // 추가
 }

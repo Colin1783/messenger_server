@@ -5,8 +5,7 @@ import com.messenger_server.mapper.MessageMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,7 +19,7 @@ public class MessageService {
 		message.setChatRoomId(chatRoomId);
 		message.setSenderId(senderId);
 		message.setContent(content);
-		message.setCreatedAt(Timestamp.from(Instant.now()));
+		message.setCreatedAt(LocalDateTime.now());
 		messageMapper.save(message);
 		return message;
 	}
