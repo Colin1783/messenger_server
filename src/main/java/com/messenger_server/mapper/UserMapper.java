@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 
 @Mapper
@@ -19,4 +20,7 @@ public interface UserMapper {
 
 	@Update("UPDATE users SET login_status = #{loginStatus}, last_logged_in = #{lastLoggedIn} WHERE username = #{username}")
 	void updateLoginStatusAndLastLoggedIn(String username, boolean loginStatus, Timestamp lastLoggedIn);
+
+	@Select("SELECT * FROM users WHERE username LIKE CONCAT('%', #{query}, '%')")
+	List<User> searchUsers(String query);
 }

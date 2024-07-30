@@ -1,11 +1,11 @@
 package com.messenger_server.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.messenger_server.service.CustomUserDetailsService;
 import com.messenger_server.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +21,7 @@ public class WebSocketController {
 	private final JwtUtil jwtUtil;
 	private final CustomUserDetailsService userDetailsService;
 	private static final Logger logger = Logger.getLogger(WebSocketController.class.getName());
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Autowired
 	private ReactiveRedisTemplate<String, String> redisTemplate;
@@ -36,8 +37,7 @@ public class WebSocketController {
 	}
 
 	@MessageMapping("/initialConnect")
-	@SendTo("/topic/messages")
-	public Map<String, String> handleInitialConnect(Map<String, String> payload) {
+	public void handleInitialConnect(Map<String, String> payload) {
 		logger.info("Received message: " + payload);
 		String token = payload.get("token");
 		try {
@@ -55,7 +55,9 @@ public class WebSocketController {
 										userDetails, null, userDetails.getAuthorities());
 						SecurityContextHolder.getContext().setAuthentication(authentication);
 						logger.info("User authenticated: " + username);
-						return Map.of("message", "Welcome, " + username);
+						String welcomeMessage = createJsonMessage(Map.of("message", "Welcome, " + username));
+						messagingTemplate.convertAndSend("/topic/messages", welcomeMessage);
+						return;
 					} else {
 						logger.warning("Token validation failed for user: " + username);
 					}
@@ -70,18 +72,36 @@ public class WebSocketController {
 			e.printStackTrace();
 		}
 		logger.warning("Authentication failed");
-		return Map.of("message", "Authentication failed");
+		String errorMessage = createJsonMessage(Map.of("message", "Authentication failed"));
+		messagingTemplate.convertAndSend("/topic/messages", errorMessage);
 	}
 
 	@MessageMapping("/chat")
 	public void handleChatMessage(Map<String, String> payload) {
 		logger.info("Received chat message: " + payload);
-		String message = payload.get("message");
-		redisTemplate.convertAndSend(CHANNEL, message).subscribe();
+		String chatRoomId = payload.get("chatRoomId");
+		String message = payload.get("content");
+		String sender = payload.get("sender");
+		if (message != null && !message.isEmpty()) {
+			String chatMessage = createJsonMessage(Map.of(
+							"chatRoomId", chatRoomId,
+							"content", message,
+							"sender", sender
+			));
+			redisTemplate.convertAndSend(CHANNEL, chatMessage).subscribe();
+			// 메시지 브로드캐스트
+			messagingTemplate.convertAndSend("/topic/chat/" + chatRoomId, chatMessage);
+		} else {
+			logger.warning("Chat message content is null or empty");
+		}
 	}
 
-	// Redis를 통해 메시지를 브로드캐스트
-	public void broadcastMessage(String message) {
-		messagingTemplate.convertAndSend("/topic/messages", message);
+	private String createJsonMessage(Map<String, String> keyValues) {
+		try {
+			return objectMapper.writeValueAsString(keyValues);
+		} catch (Exception e) {
+			logger.severe("Error creating JSON message: " + e.getMessage());
+			return "{}";
+		}
 	}
 }

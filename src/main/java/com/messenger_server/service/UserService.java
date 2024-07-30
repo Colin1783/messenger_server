@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -39,5 +40,9 @@ public class UserService {
 
 	public void logout(String username) {
 		updateLoginStatusAndLastLoggedIn(username, false);
+	}
+
+	public List<User> searchUsers(String query) {
+		return userMapper.searchUsers(query);
 	}
 }
