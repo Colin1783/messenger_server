@@ -9,4 +9,5 @@ public class ChatRoom {
 	private Long id;
 	private String name;
 	private List<User> users;
+	private Message latestMessage;
 }

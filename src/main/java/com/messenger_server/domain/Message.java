@@ -10,5 +10,6 @@ public class Message {
 	private Long chatRoomId;
 	private Long senderId;
 	private String content;
-	private Timestamp timestamp;
+	private Timestamp createdAt;
+	private String username;  // 추가
 }

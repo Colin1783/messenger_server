@@ -20,16 +20,12 @@ public class MessageService {
 		message.setChatRoomId(chatRoomId);
 		message.setSenderId(senderId);
 		message.setContent(content);
-		message.setTimestamp(Timestamp.from(Instant.now()));
+		message.setCreatedAt(Timestamp.from(Instant.now()));
 		messageMapper.save(message);
 		return message;
 	}
 
 	public List<Message> findMessagesByChatRoomId(Long chatRoomId) {
 		return messageMapper.findByChatRoomId(chatRoomId);
-	}
-
-	public Message findLatestMessageByChatRoomId(Long chatRoomId) {
-		return messageMapper.findLatestMessageByChatRoomId(chatRoomId);
 	}
 }

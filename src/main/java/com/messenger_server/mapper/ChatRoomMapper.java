@@ -46,4 +46,9 @@ public interface ChatRoomMapper {
 
 	@Select("SELECT * FROM messages WHERE chat_room_id = #{chatRoomId} ORDER BY created_at DESC LIMIT 1")
 	Message findLatestMessageByChatRoomId(Long chatRoomId);
+
+	@Select("SELECT cr.* FROM chat_rooms cr " +
+					"JOIN chat_room_users cru ON cr.id = cru.chat_room_id " +
+					"WHERE cru.user_id = #{userId}")
+	List<ChatRoom> findChatRoomsByUserId(Long userId);
 }
