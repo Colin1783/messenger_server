@@ -110,6 +110,7 @@ public class WebSocketController {
 								"username", username,
 								"created_at", createdAt
 				));
+				logger.info("Publishing chat message: " + chatMessage);
 				redisTemplate.convertAndSend(CHANNEL, chatMessage).subscribe();
 				// 메시지 브로드캐스트
 				messagingTemplate.convertAndSend("/topic/chat/" + chatRoomId, chatMessage);
@@ -134,13 +135,13 @@ public class WebSocketController {
 							"recipientId", String.valueOf(friendRequest.getRecipientId()),
 							"status", friendRequest.getStatus()
 			));
+			logger.info("Publishing friend request message: " + notificationMessage);
 			messagingTemplate.convertAndSend("/topic/friendRequests/" + friendRequest.getRecipientId(), notificationMessage);
 		} catch (Exception e) {
 			logger.severe("Error handling friend request message: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
-
 
 	private String createJsonMessage(Map<String, String> keyValues) {
 		try {

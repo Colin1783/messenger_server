@@ -77,9 +77,9 @@ public class FriendRequestService {
 			messagingTemplate.convertAndSend("/topic/friendRequests/" + request.getRequesterId(), notificationMessage);
 			messagingTemplate.convertAndSend("/topic/friendRequests/" + request.getRecipientId(), notificationMessage);
 
-			// 친구 요청 삭제
-			friendRequestMapper.delete(requestId);
 		}
+		// 친구 요청 삭제
+		friendRequestMapper.delete(requestId);
 	}
 
 	private String createJsonMessage(Map<String, String> keyValues) {
