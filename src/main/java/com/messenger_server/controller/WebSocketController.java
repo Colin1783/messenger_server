@@ -51,7 +51,7 @@ public class WebSocketController {
 			if (token != null && token.startsWith("Bearer ")) {
 				String jwtToken = token.substring(7);
 				String username = jwtUtil.extractUsername(jwtToken);
-				logger.info("Extracted username: " + username);
+//				logger.info("Extracted username: " + username);
 
 				if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 					UserDetails userDetails = userDetailsService.loadUserByUsername(username);
