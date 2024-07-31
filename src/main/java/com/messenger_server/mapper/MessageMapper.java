@@ -24,4 +24,8 @@ public interface MessageMapper {
 
 	@Select("SELECT * FROM messages WHERE chat_room_id = #{chatRoomId} ORDER BY created_at DESC LIMIT 1")
 	Message findLatestMessageByChatRoomId(Long chatRoomId);
+
+	@Delete("DELETE FROM messages WHERE chat_room_id = #{chatRoomId}")
+	void deleteMessagesByChatRoomId(Long chatRoomId);
 }
+

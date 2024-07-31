@@ -66,4 +66,11 @@ public class ChatRoomService {
 		}
 		return chatRoom;
 	}
+
+	public void deleteChatRoom(Long chatRoomId) {
+		// 채팅방에 속한 모든 메시지 삭제
+		messageMapper.deleteMessagesByChatRoomId(chatRoomId);
+		// 채팅방 삭제
+		chatRoomMapper.deleteChatRoom(chatRoomId);
+	}
 }

@@ -50,4 +50,9 @@ public class ChatRoomController {
 	public List<ChatRoom> getChatRoomsByUserId(@PathVariable Long userId) {
 		return chatRoomService.findChatRoomsByUserId(userId);
 	}
+
+	@DeleteMapping("/{chatRoomId}")
+	public void deleteChatRoom(@PathVariable Long chatRoomId) {
+		chatRoomService.deleteChatRoom(chatRoomId);
+	}
 }

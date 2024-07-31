@@ -54,4 +54,9 @@ public interface ChatRoomMapper {
 
 	@Select("SELECT username FROM users WHERE id = #{userId}")
 	String findUsernameById(@Param("userId") Long userId);  // 사용자 이름을 가져오는 메서드 추가
+
+	@Delete("""
+					DELETE FROM chat_rooms WHERE id = #{chatRoomId}
+""")
+	void deleteChatRoom(@Param("") Long chatRoomId);
 }
