@@ -55,4 +55,15 @@ public class ChatRoomService {
 			chatRoom.setLatestMessage(latestMessage);
 		}).collect(Collectors.toList());
 	}
+
+	public ChatRoom startChatWithFriend(Long userId, Long friendId) {
+		ChatRoom chatRoom = chatRoomMapper.findChatRoomByUserIds(userId, friendId);
+		if (chatRoom == null) {
+			String friendUsername = chatRoomMapper.findUsernameById(friendId);  // 친구의 username 가져오기
+			chatRoom = createChatRoom(friendUsername);  // 채팅방 이름을 친구의 username으로 설정
+			addUserToChatRoom(chatRoom.getId(), userId);
+			addUserToChatRoom(chatRoom.getId(), friendId);
+		}
+		return chatRoom;
+	}
 }

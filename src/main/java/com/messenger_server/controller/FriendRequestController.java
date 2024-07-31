@@ -35,6 +35,4 @@ public class FriendRequestController {
 class RespondFriendRequest {
 	private Long requestId;
 	private String status;
-
-	// getters and setters
 }

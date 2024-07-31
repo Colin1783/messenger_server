@@ -16,7 +16,10 @@ public class MessageController {
 
 	@PostMapping
 	public Message sendMessage(@RequestBody MessageRequest messageRequest) {
-		return messageService.saveMessage(messageRequest.getChatRoomId(), messageRequest.getSenderId(), messageRequest.getContent());
+		return messageService.saveMessage(
+						messageRequest.getChatRoomId(),
+						messageRequest.getSenderId(),
+						messageRequest.getContent());
 	}
 
 	@GetMapping("/chatroom/{chatRoomId}")

@@ -43,13 +43,7 @@ public class ChatRoomController {
 
 	@PostMapping("/start-chat")
 	public ChatRoom startChatWithFriend(@RequestParam Long userId, @RequestParam Long friendId) {
-		ChatRoom chatRoom = chatRoomService.findChatRoomByUserIds(userId, friendId);
-		if (chatRoom == null) {
-			chatRoom = chatRoomService.createChatRoom("Chat between " + userId + " and " + friendId);
-			chatRoomService.addUserToChatRoom(chatRoom.getId(), userId);
-			chatRoomService.addUserToChatRoom(chatRoom.getId(), friendId);
-		}
-		return chatRoom;
+		return chatRoomService.startChatWithFriend(userId, friendId);
 	}
 
 	@GetMapping("/user/{userId}")

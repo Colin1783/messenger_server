@@ -2,9 +2,7 @@ package com.messenger_server.mapper;
 
 import com.messenger_server.domain.Friendship;
 import com.messenger_server.domain.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -19,4 +17,10 @@ public interface FriendshipMapper {
 
 	@Select("SELECT u.* FROM users u INNER JOIN friendships f ON u.id = f.friend_id WHERE f.user_id = #{userId}")
 	List<User> findFriendsByUserId(Long userId);
+
+	@Select("SELECT * FROM friendships WHERE user_id = #{userId} AND friend_id = #{friendId}")
+	Friendship isFriend(@Param("userId") Long userId, @Param("friendId") Long friendId);
+
+	@Delete("DELETE FROM friendships WHERE user_id = #{userId} AND friend_id = #{friendId}")
+	void deleteFriendship(@Param("userId") Long userId, @Param("friendId") Long friendId);
 }

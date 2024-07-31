@@ -23,4 +23,7 @@ public interface UserMapper {
 
 	@Select("SELECT * FROM users WHERE username LIKE CONCAT('%', #{query}, '%')")
 	List<User> searchUsers(String query);
+
+	@Select("SELECT username FROM users WHERE id = #{id}")
+	String findUsernameById(Long id);
 }
