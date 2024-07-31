@@ -51,7 +51,7 @@ public interface ChatRoomMapper {
 					"JOIN chat_room_users cru ON cr.id = cru.chat_room_id " +
 					"WHERE cru.user_id = #{userId}")
 	List<ChatRoom> findChatRoomsByUserId(Long userId);
-
-	@Select("SELECT username FROM users WHERE id = #{userId}")
-	String findUsernameById(@Param("userId") Long userId);  // 사용자 이름을 가져오는 메서드 추가
+//
+//	@Select("SELECT username FROM users WHERE id = #{userId}")
+//	String findUsernameById(@Param("userId") Long userId);  // 사용자 이름을 가져오는 메서드 추가
 }
