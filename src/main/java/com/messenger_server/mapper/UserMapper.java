@@ -1,14 +1,10 @@
 package com.messenger_server.mapper;
 
 import com.messenger_server.domain.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.sql.Timestamp;
 import java.util.List;
-
 
 @Mapper
 public interface UserMapper {
@@ -26,4 +22,10 @@ public interface UserMapper {
 
 	@Select("SELECT username FROM users WHERE id = #{id}")
 	String findUsernameById(Long id);
+
+	@Select("SELECT * FROM users WHERE id = #{id}")
+	User findById(Long id);
+
+	@Update("UPDATE users SET email = #{email}, name = #{name}, birthdate = #{birthdate}, cellphone = #{cellphone}, password = #{password} WHERE id = #{id}")
+	void update(User user);
 }

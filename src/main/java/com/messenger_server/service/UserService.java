@@ -1,5 +1,6 @@
 package com.messenger_server.service;
 
+import com.messenger_server.domain.UpdateUserRequest;
 import com.messenger_server.domain.User;
 import com.messenger_server.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,23 @@ public class UserService {
 
 	public List<User> searchUsers(String query) {
 		return userMapper.searchUsers(query);
+	}
+
+	public void updateUser(UpdateUserRequest request) {
+		User user = userMapper.findById(request.getId());
+		if (user == null) {
+			throw new IllegalArgumentException("User not found");
+		}
+		if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+			throw new IllegalArgumentException("Current password is incorrect");
+		}
+		if (request.getNewPassword() != null && !request.getNewPassword().isEmpty()) {
+			user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		}
+		user.setEmail(request.getEmail());
+		user.setName(request.getName());
+		user.setBirthdate(request.getBirthdate());
+		user.setCellphone(request.getCellphone());
+		userMapper.update(user);
 	}
 }
