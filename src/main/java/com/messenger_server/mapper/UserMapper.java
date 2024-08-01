@@ -17,7 +17,11 @@ public interface UserMapper {
 	@Update("UPDATE users SET login_status = #{loginStatus}, last_logged_in = #{lastLoggedIn} WHERE username = #{username}")
 	void updateLoginStatusAndLastLoggedIn(String username, boolean loginStatus, Timestamp lastLoggedIn);
 
-	@Select("SELECT * FROM users WHERE username LIKE CONCAT('%', #{query}, '%')")
+	@Select("""
+					SELECT * FROM users 
+					         WHERE username 
+					                   LIKE CONCAT('%', #{query}, '%') OR name LIKE CONCAT('%', #{query}, '%')
+					""")
 	List<User> searchUsers(String query);
 
 	@Select("SELECT username FROM users WHERE id = #{id}")
