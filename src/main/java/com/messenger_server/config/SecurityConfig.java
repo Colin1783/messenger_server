@@ -42,6 +42,7 @@ public class SecurityConfig {
 										.requestMatchers("/error").permitAll()
 										.requestMatchers("/auth/register", "/auth/login").permitAll()
 										.requestMatchers("/ws/**").permitAll() // WebSocket 경로 허용
+										.requestMatchers("/friend-requests/notifications").permitAll() // EventSource 경로 허용
 										.anyRequest().authenticated()
 						)
 						.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

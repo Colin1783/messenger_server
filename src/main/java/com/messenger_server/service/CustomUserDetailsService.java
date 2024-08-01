@@ -24,4 +24,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 		}
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), new ArrayList<>());
 	}
+
+	public UserDetails loadUserByUserId(Long userId) throws UsernameNotFoundException {
+		String username = userMapper.findUsernameById(userId);
+		if (username == null) {
+			throw new UsernameNotFoundException("User not found");
+		}
+		return loadUserByUsername(username);
+	}
 }
