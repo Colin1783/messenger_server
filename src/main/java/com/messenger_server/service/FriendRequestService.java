@@ -48,7 +48,7 @@ public class FriendRequestService {
 						"status", "PENDING"
 		));
 		logger.info("Publishing friend request event: " + notificationMessage);
-		eventPublisher.publishEvent(new FriendRequestEvent(this, notificationMessage));
+		eventPublisher.publishEvent(new FriendRequestEvent(this, notificationMessage, recipientId));
 	}
 
 	public List<FriendRequest> getPendingRequests(Long recipientId) {
@@ -73,7 +73,7 @@ public class FriendRequestService {
 							"recipientId", String.valueOf(request.getRecipientId())
 			));
 			logger.info("Publishing friend request accepted event: " + notificationMessage);
-			eventPublisher.publishEvent(new FriendRequestEvent(this, notificationMessage));
+			eventPublisher.publishEvent(new FriendRequestEvent(this, notificationMessage, request.getRecipientId()));
 		}
 		friendRequestMapper.delete(requestId);
 	}
