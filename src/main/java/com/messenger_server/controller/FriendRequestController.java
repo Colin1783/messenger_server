@@ -36,16 +36,19 @@ public class FriendRequestController {
 
 	@PostMapping("/send")
 	public void sendFriendRequest(@RequestParam Long requesterId, @RequestParam Long recipientId) {
+		logger.info("sendFriendRequest called with requesterId: " + requesterId + " and recipientId: " + recipientId);
 		friendRequestService.sendFriendRequest(requesterId, recipientId);
 	}
 
 	@GetMapping("/pending/{recipientId}")
 	public List<FriendRequest> getPendingRequests(@PathVariable Long recipientId) {
+		logger.info("getPendingRequests called with recipientId: " + recipientId);
 		return friendRequestService.getPendingRequests(recipientId);
 	}
 
 	@PostMapping("/respond")
 	public void respondToFriendRequest(@RequestBody RespondFriendRequest request) {
+		logger.info("respondToFriendRequest called with requesterId: " + request.getRequesterId() + ", recipientId: " + request.getRecipientId() + ", status: " + request.getStatus());
 		friendRequestService.respondToFriendRequest(request.getRequesterId(), request.getRecipientId(), request.getStatus(), request.getRequesterUsername());
 	}
 
@@ -107,6 +110,7 @@ public class FriendRequestController {
 
 @Data
 class RespondFriendRequest {
+	private Long id; // 새로운 필드 추가
 	private Long requesterId;
 	private Long recipientId;
 	private String status;

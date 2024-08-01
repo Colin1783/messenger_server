@@ -16,7 +16,7 @@ public interface FriendRequestMapper {
             SELECT fr.*, u.username as requesterUsername 
             FROM friend_requests fr 
             JOIN users u ON fr.requester_id = u.id 
-            WHERE fr.recipient_id = #{recipientId} AND fr.status = 'PENDING'
+            WHERE fr.recipient_id = #{userId} AND fr.status = 'PENDING'
             """)
 	@Results({
 					@Result(property = "id", column = "id"),
@@ -26,7 +26,23 @@ public interface FriendRequestMapper {
 					@Result(property = "createdAt", column = "created_at"),
 					@Result(property = "requesterUsername", column = "requesterUsername")
 	})
-	List<FriendRequest> findPendingRequests(Long recipientId);
+	List<FriendRequest> findPendingRequestsByRecipient(Long userId);
+
+	@Select("""
+            SELECT fr.*, u.username as requesterUsername 
+            FROM friend_requests fr 
+            JOIN users u ON fr.requester_id = u.id 
+            WHERE fr.requester_id = #{userId} AND fr.status = 'PENDING'
+            """)
+	@Results({
+					@Result(property = "id", column = "id"),
+					@Result(property = "requesterId", column = "requester_id"),
+					@Result(property = "recipientId", column = "recipient_id"),
+					@Result(property = "status", column = "status"),
+					@Result(property = "createdAt", column = "created_at"),
+					@Result(property = "requesterUsername", column = "requesterUsername")
+	})
+	List<FriendRequest> findPendingRequests(Long userId);
 
 	@Update("UPDATE friend_requests SET status = #{status} WHERE id = #{id}")
 	void updateStatus(@Param("id") Long id, @Param("status") String status);

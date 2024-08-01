@@ -39,8 +39,7 @@ public class FriendRequestService {
 		friendRequest.setCreatedAt(Timestamp.from(Instant.now()));
 		friendRequestMapper.insert(friendRequest);
 
-		// Get the username for the requester
-		String requesterUsername = friendRequestMapper.findPendingRequests(recipientId).stream()
+		String requesterUsername = friendRequestMapper.findPendingRequestsByRecipient(recipientId).stream()
 						.filter(req -> req.getRequesterId().equals(requesterId))
 						.findFirst()
 						.map(FriendRequest::getRequesterUsername)
@@ -59,14 +58,16 @@ public class FriendRequestService {
 		eventPublisher.publishEvent(new FriendRequestEvent(this, notificationMessage, recipientId));
 	}
 
-	public List<FriendRequest> getPendingRequests(Long recipientId) {
-		return friendRequestMapper.findPendingRequests(recipientId);
+	public List<FriendRequest> getPendingRequests(Long userId) {
+		List<FriendRequest> requests = friendRequestMapper.findPendingRequests(userId);
+		requests.addAll(friendRequestMapper.findPendingRequestsByRecipient(userId));
+		return requests;
 	}
 
 	public void respondToFriendRequest(Long requesterId, Long recipientId, String status, String requesterUsername) {
 		logger.info("Attempting to respond to friend request from user " + requesterId + " to user " + recipientId + " with status " + status);
 
-		List<FriendRequest> pendingRequests = friendRequestMapper.findPendingRequests(recipientId);
+		List<FriendRequest> pendingRequests = friendRequestMapper.findPendingRequestsByRecipient(recipientId);
 		logger.info("Pending requests for user " + recipientId + ": " + pendingRequests);
 
 		FriendRequest request = pendingRequests.stream()
