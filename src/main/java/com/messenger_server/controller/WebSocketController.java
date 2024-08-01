@@ -123,26 +123,6 @@ public class WebSocketController {
 		}
 	}
 
-	@MessageMapping("/friendRequests")
-	public void handleFriendRequestMessage(String payload) {
-		logger.info("Received friend request message: " + payload);
-
-		try {
-			FriendRequest friendRequest = objectMapper.readValue(payload, FriendRequest.class);
-			String notificationMessage = createJsonMessage(Map.of(
-							"type", "friendRequest",
-							"requesterId", String.valueOf(friendRequest.getRequesterId()),
-							"recipientId", String.valueOf(friendRequest.getRecipientId()),
-							"status", friendRequest.getStatus()
-			));
-			logger.info("Publishing friend request message: " + notificationMessage);
-			messagingTemplate.convertAndSend("/topic/friendRequests/" + friendRequest.getRecipientId(), notificationMessage);
-		} catch (Exception e) {
-			logger.severe("Error handling friend request message: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
 	private String createJsonMessage(Map<String, String> keyValues) {
 		try {
 			return objectMapper.writeValueAsString(keyValues);

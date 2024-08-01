@@ -28,7 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	private static final List<String> EXCLUDE_URLS = List.of("/auth/register", "/auth/login");
+	private static final List<String> EXCLUDE_URLS = List.of("/auth/register", "/auth/login", "/friend-requests/notifications");
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {

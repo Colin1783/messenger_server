@@ -17,8 +17,15 @@ spring:
     host: localhost
     port: 6379
 
+server:
+  tomcat:
+    max-threads: 200
+    accept-count: 100
+    maxx-connections: 1000
 
 jwt:
   secret: ${JWT_SECRET_KEY}
 
 logging.level.org.springframework.security: DEBUG
+
+
