@@ -39,13 +39,21 @@ public class FriendRequestService {
 		friendRequest.setCreatedAt(Timestamp.from(Instant.now()));
 		friendRequestMapper.insert(friendRequest);
 
+		// Get the username for the requester
+		String requesterUsername = friendRequestMapper.findPendingRequests(recipientId).stream()
+						.filter(req -> req.getRequesterId().equals(requesterId))
+						.findFirst()
+						.map(FriendRequest::getRequesterUsername)
+						.orElse("Unknown");
+
 		logger.info("Friend request sent from user " + requesterId + " to user " + recipientId);
 
 		String notificationMessage = createJsonMessage(Map.of(
 						"type", "friendRequest",
 						"requesterId", String.valueOf(requesterId),
 						"recipientId", String.valueOf(recipientId),
-						"status", "PENDING"
+						"status", "PENDING",
+						"requesterUsername", requesterUsername
 		));
 		logger.info("Publishing friend request event: " + notificationMessage);
 		eventPublisher.publishEvent(new FriendRequestEvent(this, notificationMessage, recipientId));
@@ -55,11 +63,28 @@ public class FriendRequestService {
 		return friendRequestMapper.findPendingRequests(recipientId);
 	}
 
-	public void respondToFriendRequest(Long requestId, String status) {
-		friendRequestMapper.updateStatus(requestId, status);
+	public void respondToFriendRequest(Long requesterId, Long recipientId, String status, String requesterUsername) {
+		logger.info("Attempting to respond to friend request from user " + requesterId + " to user " + recipientId + " with status " + status);
+
+		List<FriendRequest> pendingRequests = friendRequestMapper.findPendingRequests(recipientId);
+		logger.info("Pending requests for user " + recipientId + ": " + pendingRequests);
+
+		FriendRequest request = pendingRequests.stream()
+						.filter(req -> req.getRequesterId().equals(requesterId))
+						.findFirst()
+						.orElse(null);
+
+		if (request == null) {
+			logger.warning("No pending friend request found for requester " + requesterId + " and recipient " + recipientId);
+			throw new IllegalStateException("No pending friend request found.");
+		}
+
+		logger.info("Updating status for friend request " + request.getId() + " to " + status);
+		friendRequestMapper.updateStatus(request.getId(), status);
+
 		if ("ACCEPTED".equals(status)) {
-			FriendRequest request = friendRequestMapper.findById(requestId);
 			if (request.getRequesterId() == null || request.getRecipientId() == null) {
+				logger.warning("Invalid friend request data: " + request);
 				throw new IllegalStateException("Invalid friend request data: " + request);
 			}
 			friendshipMapper.insert(new Friendship(request.getRequesterId(), request.getRecipientId()));
@@ -70,12 +95,15 @@ public class FriendRequestService {
 			String notificationMessage = createJsonMessage(Map.of(
 							"type", "friendRequestAccepted",
 							"requesterId", String.valueOf(request.getRequesterId()),
-							"recipientId", String.valueOf(request.getRecipientId())
+							"recipientId", String.valueOf(request.getRecipientId()),
+							"requesterUsername", requesterUsername
 			));
 			logger.info("Publishing friend request accepted event: " + notificationMessage);
 			eventPublisher.publishEvent(new FriendRequestEvent(this, notificationMessage, request.getRecipientId()));
 		}
-		friendRequestMapper.delete(requestId);
+
+		logger.info("Deleting friend request " + request.getId());
+		friendRequestMapper.delete(request.getId());
 	}
 
 	private String createJsonMessage(Map<String, String> keyValues) {

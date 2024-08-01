@@ -12,7 +12,12 @@ public interface FriendRequestMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "id")
 	void insert(FriendRequest friendRequest);
 
-	@Select("SELECT fr.*, u.username as requesterUsername FROM friend_requests fr JOIN users u ON fr.requester_id = u.id WHERE fr.recipient_id = #{recipientId} AND fr.status = 'PENDING'")
+	@Select("""
+            SELECT fr.*, u.username as requesterUsername 
+            FROM friend_requests fr 
+            JOIN users u ON fr.requester_id = u.id 
+            WHERE fr.recipient_id = #{recipientId} AND fr.status = 'PENDING'
+            """)
 	@Results({
 					@Result(property = "id", column = "id"),
 					@Result(property = "requesterId", column = "requester_id"),

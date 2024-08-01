@@ -46,7 +46,7 @@ public class FriendRequestController {
 
 	@PostMapping("/respond")
 	public void respondToFriendRequest(@RequestBody RespondFriendRequest request) {
-		friendRequestService.respondToFriendRequest(request.getRequestId(), request.getStatus());
+		friendRequestService.respondToFriendRequest(request.getRequesterId(), request.getRecipientId(), request.getStatus(), request.getRequesterUsername());
 	}
 
 	@GetMapping(value = "/notifications", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -107,6 +107,8 @@ public class FriendRequestController {
 
 @Data
 class RespondFriendRequest {
-	private Long requestId;
+	private Long requesterId;
+	private Long recipientId;
 	private String status;
+	private String requesterUsername;
 }
