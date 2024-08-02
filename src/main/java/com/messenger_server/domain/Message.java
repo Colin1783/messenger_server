@@ -10,6 +10,6 @@ public class Message {
 	private Long chatRoomId;
 	private Long senderId;
 	private String content;
-	private LocalDateTime createdAt;  // 변경된 부분
-	private String username;  // 추가
+	private LocalDateTime createdAt;
+	private String username;
 }

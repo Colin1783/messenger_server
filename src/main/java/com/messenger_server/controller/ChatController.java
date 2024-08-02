@@ -17,7 +17,9 @@ public class ChatController {
 
 	@PostMapping("/message")
 	public Mono<Void> sendMessage(@RequestBody String message) {
-		return redisTemplate.convertAndSend(CHANNEL, message).then();
+		return redisTemplate.convertAndSend(CHANNEL, message)
+						.doOnError(error -> System.err.println("메시지 전송 오류: " + error.getMessage()))
+						.then();
 	}
 
 	@GetMapping("/messages")
