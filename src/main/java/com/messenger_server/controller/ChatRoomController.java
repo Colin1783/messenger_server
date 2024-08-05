@@ -1,4 +1,3 @@
-// ChatRoomController.java
 package com.messenger_server.controller;
 
 import com.messenger_server.domain.ChatRoom;
@@ -17,8 +16,8 @@ public class ChatRoomController {
 	private ChatRoomService chatRoomService;
 
 	@PostMapping
-	public ChatRoom createChatRoom(@RequestBody String name) {
-		return chatRoomService.createChatRoom(name);
+	public ChatRoom createChatRoom() {
+		return chatRoomService.createChatRoom();
 	}
 
 	@PostMapping("/{chatRoomId}/users/{userId}")

@@ -1,4 +1,3 @@
-// ChatRoomMapper.java
 package com.messenger_server.mapper;
 
 import com.messenger_server.domain.ChatRoom;
@@ -10,15 +9,14 @@ import java.util.List;
 
 @Mapper
 public interface ChatRoomMapper {
-	@Insert("INSERT INTO chat_rooms(name) VALUES(#{name})")
+	@Insert("INSERT INTO chat_rooms(created_at) VALUES(DEFAULT)")
 	@Options(useGeneratedKeys = true, keyProperty = "id")
 	void save(ChatRoom chatRoom);
 
 	@Select("SELECT * FROM chat_rooms WHERE id = #{id}")
 	@Results({
 					@Result(property = "id", column = "id"),
-					@Result(property = "name", column = "name"),
-					@Result(property = "users", column = "id", many = @Many(select = "findUsersByChatRoomId")),
+					@Result(property = "createdAt", column = "created_at"),
 					@Result(property = "latestMessage", column = "id", one = @One(select = "findLatestMessageByChatRoomId"))
 	})
 	ChatRoom findById(Long id);
@@ -26,8 +24,7 @@ public interface ChatRoomMapper {
 	@Select("SELECT * FROM chat_rooms")
 	@Results({
 					@Result(property = "id", column = "id"),
-					@Result(property = "name", column = "name"),
-					@Result(property = "users", column = "id", many = @Many(select = "findUsersByChatRoomId")),
+					@Result(property = "createdAt", column = "created_at"),
 					@Result(property = "latestMessage", column = "id", one = @One(select = "findLatestMessageByChatRoomId"))
 	})
 	List<ChatRoom> findAll();
@@ -37,6 +34,9 @@ public interface ChatRoomMapper {
 
 	@Select("SELECT u.* FROM users u INNER JOIN chat_room_users cru ON u.id = cru.user_id WHERE cru.chat_room_id = #{chatRoomId}")
 	List<User> findUsersByChatRoomId(Long chatRoomId);
+
+	@Select("SELECT u.* FROM users u INNER JOIN chat_room_users cru ON u.id = cru.user_id WHERE cru.chat_room_id = #{chatRoomId} AND u.id != #{userId}")
+	User findOtherUserInChatRoom(@Param("chatRoomId") Long chatRoomId, @Param("userId") Long userId);
 
 	@Select("SELECT cr.* FROM chat_rooms cr " +
 					"INNER JOIN chat_room_users cru1 ON cr.id = cru1.chat_room_id " +
@@ -53,10 +53,8 @@ public interface ChatRoomMapper {
 	List<ChatRoom> findChatRoomsByUserId(Long userId);
 
 	@Select("SELECT username FROM users WHERE id = #{userId}")
-	String findUsernameById(@Param("userId") Long userId);  // 사용자 이름을 가져오는 메서드 추가
+	String findUsernameById(@Param("userId") Long userId);
 
-	@Delete("""
-					DELETE FROM chat_rooms WHERE id = #{chatRoomId}
-""")
-	void deleteChatRoom(@Param("") Long chatRoomId);
+	@Delete("DELETE FROM chat_rooms WHERE id = #{chatRoomId}")
+	void deleteChatRoom(@Param("chatRoomId") Long chatRoomId);
 }

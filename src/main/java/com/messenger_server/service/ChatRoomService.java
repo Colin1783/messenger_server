@@ -1,4 +1,3 @@
-// ChatRoomService.java
 package com.messenger_server.service;
 
 import com.messenger_server.domain.ChatRoom;
@@ -21,9 +20,8 @@ public class ChatRoomService {
 	@Autowired
 	private MessageMapper messageMapper;
 
-	public ChatRoom createChatRoom(String name) {
+	public ChatRoom createChatRoom() {
 		ChatRoom chatRoom = new ChatRoom();
-		chatRoom.setName(name);
 		chatRoomMapper.save(chatRoom);
 		return chatRoom;
 	}
@@ -44,23 +42,21 @@ public class ChatRoomService {
 		return chatRoomMapper.findUsersByChatRoomId(chatRoomId);
 	}
 
-	public ChatRoom findChatRoomByUserIds(Long userId, Long friendId) {
-		return chatRoomMapper.findChatRoomByUserIds(userId, friendId);
-	}
-
 	public List<ChatRoom> findChatRoomsByUserId(Long userId) {
 		List<ChatRoom> chatRooms = chatRoomMapper.findChatRoomsByUserId(userId);
 		return chatRooms.stream().peek(chatRoom -> {
 			Message latestMessage = messageMapper.findLatestMessageByChatRoomId(chatRoom.getId());
 			chatRoom.setLatestMessage(latestMessage);
+			// 현재 사용자를 제외한 다른 사용자 정보 설정
+			User otherUser = chatRoomMapper.findOtherUserInChatRoom(chatRoom.getId(), userId);
+			chatRoom.setOtherUser(otherUser);
 		}).collect(Collectors.toList());
 	}
 
 	public ChatRoom startChatWithFriend(Long userId, Long friendId) {
 		ChatRoom chatRoom = chatRoomMapper.findChatRoomByUserIds(userId, friendId);
 		if (chatRoom == null) {
-			String friendUsername = chatRoomMapper.findUsernameById(friendId);  // 친구의 username 가져오기
-			chatRoom = createChatRoom(friendUsername);  // 채팅방 이름을 친구의 username으로 설정
+			chatRoom = createChatRoom();  // 채팅방 생성
 			addUserToChatRoom(chatRoom.getId(), userId);
 			addUserToChatRoom(chatRoom.getId(), friendId);
 		}
